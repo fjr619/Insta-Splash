@@ -20,7 +20,7 @@ import com.fjr619.instasplash.domain.model.UnsplashImage
 @Composable
 fun ImageCard(
     modifier: Modifier = Modifier,
-    image: UnsplashImage?
+    image: UnsplashImage?,
 ) {
     val imageRequest = ImageRequest.Builder(LocalContext.current)
         .data(image?.imageUrlSmall)

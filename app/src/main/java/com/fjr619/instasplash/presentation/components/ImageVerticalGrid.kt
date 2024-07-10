@@ -1,6 +1,7 @@
 package com.fjr619.instasplash.presentation.components
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
@@ -8,6 +9,7 @@ import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import com.fjr619.instasplash.domain.model.UnsplashImage
 
@@ -15,7 +17,9 @@ import com.fjr619.instasplash.domain.model.UnsplashImage
 fun ImagesVerticalGrid(
     modifier: Modifier = Modifier,
     images: List<UnsplashImage?>,
-    onImageClick: (String) -> Unit
+    onImageClick: (String) -> Unit,
+    onImageDragStart: (UnsplashImage?) -> Unit,
+    onImageDragEnd: () -> Unit,
 ) {
     LazyVerticalStaggeredGrid(
         modifier = modifier,
@@ -29,6 +33,14 @@ fun ImagesVerticalGrid(
                 image = image,
                 modifier = Modifier
                     .clickable { image?.id?.let { onImageClick(it) } }
+                    .pointerInput(Unit) {
+                        detectDragGesturesAfterLongPress(
+                            onDragStart = { onImageDragStart(image) },
+                            onDragCancel = { onImageDragEnd() },
+                            onDragEnd = { onImageDragEnd() },
+                            onDrag = { _, _ -> }
+                        )
+                    }
             )
         }
     }

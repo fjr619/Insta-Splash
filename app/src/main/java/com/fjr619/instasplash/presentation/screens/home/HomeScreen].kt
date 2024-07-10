@@ -14,6 +14,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -24,6 +28,7 @@ import com.fjr619.instasplash.R
 import com.fjr619.instasplash.domain.model.UnsplashImage
 import com.fjr619.instasplash.presentation.components.ImageSplashAppBar
 import com.fjr619.instasplash.presentation.components.ImagesVerticalGrid
+import com.fjr619.instasplash.presentation.components.ZoomedImageCard
 import com.fjr619.instasplash.presentation.screens.destinations.FavoritesScreenDestination
 import com.fjr619.instasplash.presentation.screens.destinations.FullImageScreenDestination
 import com.fjr619.instasplash.presentation.screens.destinations.SearchScreenDestination
@@ -66,6 +71,8 @@ private fun HomeContent(
     onSearchClick: () -> Unit,
     onFABClick: () -> Unit,
 ) {
+    var showImagePreview by remember { mutableStateOf(false) }
+    var activeImage by remember { mutableStateOf<UnsplashImage?>(null) }
 
     Scaffold(
         topBar = {
@@ -74,17 +81,27 @@ private fun HomeContent(
                 onSearchClick = onSearchClick
             )
         },
-        modifier = Modifier.fillMaxSize().nestedScroll(scrollBehavior.nestedScrollConnection)
+        modifier = Modifier
+            .fillMaxSize()
+            .nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { paddingValues ->
         Box(
             modifier = Modifier
-                .fillMaxSize().padding(paddingValues)
+                .fillMaxSize()
+                .padding(paddingValues)
                 .background(MaterialTheme.colorScheme.surface),
         ) {
             ImagesVerticalGrid(
                 modifier = Modifier.fillMaxSize(),
                 images = images,
-                onImageClick = onImageClick
+                onImageClick = onImageClick,
+                onImageDragStart = { image ->
+                    activeImage = image
+                    showImagePreview = true
+                },
+                onImageDragEnd = {
+                    activeImage = null
+                    showImagePreview = false }
             )
 
             FloatingActionButton(
@@ -99,6 +116,12 @@ private fun HomeContent(
                     tint = MaterialTheme.colorScheme.onBackground
                 )
             }
+
+            ZoomedImageCard(
+                modifier = Modifier.padding(20.dp),
+                isVisible = showImagePreview,
+                image = activeImage
+            )
         }
     }
 

@@ -90,4 +90,5 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.splashscreen)
     implementation(libs.google.fonts)
+    implementation(libs.cloudy)
 }
