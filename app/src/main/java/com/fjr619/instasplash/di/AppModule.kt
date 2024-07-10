@@ -3,7 +3,7 @@ package com.fjr619.instasplash.di
 import com.fjr619.instasplash.data.remote.RemoteDatasource
 import com.fjr619.instasplash.data.remote.RemoteDatasourceImpl
 import com.fjr619.instasplash.data.remote.createHttpClient
-import com.fjr619.instasplash.presentation.home.HomeViewModel
+import com.fjr619.instasplash.presentation.screens.home.HomeViewModel
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.engine.android.Android

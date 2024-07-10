@@ -1,4 +1,4 @@
-package com.fjr619.instasplash.presentation.home
+package com.fjr619.instasplash.presentation.screens.home
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf

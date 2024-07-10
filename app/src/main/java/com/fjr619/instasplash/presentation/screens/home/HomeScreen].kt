@@ -1,4 +1,4 @@
-package com.fjr619.instasplash.presentation.home
+package com.fjr619.instasplash.presentation.screens.home
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
@@ -24,9 +24,13 @@ import com.fjr619.instasplash.R
 import com.fjr619.instasplash.domain.model.UnsplashImage
 import com.fjr619.instasplash.presentation.components.ImageSplashAppBar
 import com.fjr619.instasplash.presentation.components.ImagesVerticalGrid
+import com.fjr619.instasplash.presentation.screens.destinations.FavoritesScreenDestination
+import com.fjr619.instasplash.presentation.screens.destinations.FullImageScreenDestination
+import com.fjr619.instasplash.presentation.screens.destinations.SearchScreenDestination
 import com.fjr619.instasplash.presentation.theme.InstaSplashTheme
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -34,15 +38,22 @@ import org.koin.androidx.compose.koinViewModel
 @Destination
 @Composable
 fun HomeScreen(
-    viewModel: HomeViewModel = koinViewModel()
+    viewModel: HomeViewModel = koinViewModel(),
+    navigator: DestinationsNavigator
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     HomeContent(
         scrollBehavior,
         images = viewModel.images,
-        onImageClick = {},
-        onSearchClick = {},
-        onFABClick = {}
+        onImageClick = { imageId ->
+            navigator.navigate(FullImageScreenDestination(imageId))
+        },
+        onSearchClick = {
+            navigator.navigate(SearchScreenDestination)
+        },
+        onFABClick = {
+            navigator.navigate(FavoritesScreenDestination)
+        }
     )
 }
 

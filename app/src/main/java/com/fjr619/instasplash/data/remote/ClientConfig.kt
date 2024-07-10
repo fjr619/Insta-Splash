@@ -3,6 +3,7 @@ package com.fjr619.instasplash.data.remote
 import com.fjr619.instasplash.BuildConfig
 import com.fjr619.instasplash.data.remote.response.FailedResponse
 import com.fjr619.instasplash.data.remote.response.FailedResponseException
+import com.fjr619.instasplash.data.util.Constants
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.HttpClientEngine
@@ -57,7 +58,7 @@ fun createHttpClient(httpClientEngine: HttpClientEngine) = HttpClient(httpClient
     }
 
     defaultRequest {
-        url("https://api.unsplash.com/")
+        url(Constants.BASE_URL)
         header("Authorization", "Client-ID ${BuildConfig.API_KEY}")
         contentType(ContentType.Application.Json)
     }
