@@ -100,7 +100,7 @@ private fun HomeContent(
                     showImagePreview = true
                 },
                 onImageDragEnd = {
-                    activeImage = null
+//                    activeImage = null
                     showImagePreview = false }
             )
 
