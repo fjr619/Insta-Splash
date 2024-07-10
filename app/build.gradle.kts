@@ -89,4 +89,5 @@ dependencies {
     implementation(libs.runtime.compose)
     implementation(libs.coil.compose)
     implementation(libs.splashscreen)
+    implementation(libs.google.fonts)
 }

@@ -20,6 +20,7 @@ ktor = "2.3.8"
 kotlinx-serialization-json = "1.6.3"
 splashscreen = "1.0.1"
 secretsPlugin = "2.0.1"
+google-fonts = "1.6.8"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -64,6 +65,7 @@ coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil"}
 cloudy = { module = "com.github.skydoves:cloudy", version.ref = "cloudy" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization-json"}
 splashscreen = { module = "androidx.core:core-splashscreen", version.ref="splashscreen" }
+google-fonts = { module = "androidx.compose.ui:ui-text-google-fonts", version.ref = "google-fonts" }
 
 [bundles]
 koin = [
