@@ -42,6 +42,10 @@ import com.fjr619.instasplash.presentation.screens.full_image.components.Downloa
 import com.fjr619.instasplash.presentation.screens.full_image.components.FullImageTopAppBar
 import com.fjr619.instasplash.presentation.screens.full_image.components.ImageDownloadOption
 import com.fjr619.instasplash.presentation.util.rememberWindowInsetsController
+import com.fjr619.instasplash.presentation.util.snackbar.AppSnackbarVisual
+import com.fjr619.instasplash.presentation.util.snackbar.LocalSnackbarController
+import com.fjr619.instasplash.presentation.util.snackbar.SnackbarController
+import com.fjr619.instasplash.presentation.util.snackbar.SnackbarMessageHandler
 import com.fjr619.instasplash.presentation.util.toggleStatusBars
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
@@ -65,6 +69,7 @@ fun FullImageScreen(
 ) {
 
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val snackbarController: SnackbarController = LocalSnackbarController.current
 
     FullImageContent(
         state = state,
@@ -72,7 +77,14 @@ fun FullImageScreen(
         onPhotographerNameClick = {
             navigator.navigate(ProfileScreenDestination(profileLink = it))
         },
-        onImageDownloadClick = viewModel::downloadImage
+        onImageDownloadClick = { url, title ->
+            viewModel.downloadImage(url, title)
+            snackbarController.showMessage(
+                snackbarVisuals = AppSnackbarVisual(
+                    message = "Downloading ...",
+                )
+            )
+        }
     )
 }
 
@@ -116,7 +128,6 @@ fun FullImageContent(
             }
             url?.let {
                 onImageDownloadClick(it, state.image?.description?.take(20))
-                Toast.makeText(context, "Downloading...", Toast.LENGTH_SHORT).show()
             }
         }
     )
@@ -221,8 +232,6 @@ fun FullImageContent(
                                     }
                             )
                         }
-
-
                     }
                 }
 
