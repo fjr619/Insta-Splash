@@ -3,16 +3,18 @@ package com.fjr619.instasplash.di
 import com.fjr619.instasplash.data.remote.RemoteDatasource
 import com.fjr619.instasplash.data.remote.RemoteDatasourceImpl
 import com.fjr619.instasplash.data.remote.createHttpClient
+import com.fjr619.instasplash.data.repository.ImageDownloaderRepositoryImpl
 import com.fjr619.instasplash.data.repository.ImageRepositoryImpl
+import com.fjr619.instasplash.domain.repository.ImageDownloaderRepository
 import com.fjr619.instasplash.domain.repository.ImageRepository
 import com.fjr619.instasplash.presentation.screens.full_image.FullImageViewModel
 import com.fjr619.instasplash.presentation.screens.home.HomeViewModel
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.engine.android.Android
+import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
-
 
 val remoteModule = module {
     single<HttpClientEngine> { Android.create() }
@@ -22,9 +24,10 @@ val remoteModule = module {
 
 val repositoryModule = module {
     factory<ImageRepository> { ImageRepositoryImpl(get()) }
+    factory<ImageDownloaderRepository> { ImageDownloaderRepositoryImpl(androidContext())}
 }
 
 val viewModelModule = module {
     viewModel { HomeViewModel(get()) }
-    viewModel { FullImageViewModel(get(), get()) }
+    viewModel { FullImageViewModel(get(), get(), get()) }
 }

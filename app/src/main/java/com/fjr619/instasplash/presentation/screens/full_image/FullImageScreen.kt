@@ -1,6 +1,7 @@
 package com.fjr619.instasplash.presentation.screens.full_image
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -12,9 +13,11 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -29,12 +32,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import com.fjr619.instasplash.presentation.components.ImageSplashLoading
 import com.fjr619.instasplash.presentation.screens.destinations.ProfileScreenDestination
+import com.fjr619.instasplash.presentation.screens.full_image.components.DownloadOptionsBottomSheet
 import com.fjr619.instasplash.presentation.screens.full_image.components.FullImageTopAppBar
+import com.fjr619.instasplash.presentation.screens.full_image.components.ImageDownloadOption
 import com.fjr619.instasplash.presentation.util.rememberWindowInsetsController
 import com.fjr619.instasplash.presentation.util.toggleStatusBars
 import com.ramcosta.composedestinations.annotation.Destination
@@ -61,27 +67,30 @@ fun FullImageScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     FullImageContent(
-        fullImageState = state,
+        state = state,
         onBackClick = { navigator.navigateUp() },
         onPhotographerNameClick = {
             navigator.navigate(ProfileScreenDestination(profileLink = it))
-        }
+        },
+        onImageDownloadClick = viewModel::downloadImage
     )
 }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun FullImageContent(
-    fullImageState: FullImageState,
+    state: FullImageState,
     onBackClick: () -> Unit,
-    onPhotographerNameClick: (String) -> Unit
+    onPhotographerNameClick: (String) -> Unit,
+    onImageDownloadClick: (String, String?) -> Unit
 ) {
-
+    val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var showBars by rememberSaveable { mutableStateOf(false) }
     val windowInsetsController = rememberWindowInsetsController()
-
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var isDownloadBottomSheetOpen by remember { mutableStateOf(false) }
 
     LaunchedEffect(key1 = showBars) {
         windowInsetsController.toggleStatusBars(show = showBars)
@@ -92,15 +101,37 @@ fun FullImageContent(
         onBackClick()
     }
 
+    DownloadOptionsBottomSheet(
+        isOpen = isDownloadBottomSheetOpen,
+        sheetState = sheetState,
+        onDismissRequest = { isDownloadBottomSheetOpen = false },
+        onOptionClick = { option ->
+            scope.launch { sheetState.hide() }.invokeOnCompletion {
+                if (!sheetState.isVisible) isDownloadBottomSheetOpen = false
+            }
+            val url = when (option) {
+                ImageDownloadOption.SMALL -> state.image?.imageUrlSmall
+                ImageDownloadOption.MEDIUM -> state.image?.imageUrlRegular
+                ImageDownloadOption.ORIGINAL -> state.image?.imageUrlRaw
+            }
+            url?.let {
+                onImageDownloadClick(it, state.image?.description?.take(20))
+                Toast.makeText(context, "Downloading...", Toast.LENGTH_SHORT).show()
+            }
+        }
+    )
+
     Scaffold(
         topBar = {
             FullImageTopAppBar(
-                image = fullImageState.image,
-                isError = fullImageState.isError,
+                image = state.image,
+                isError = state.isError,
                 isVisible = showBars,
                 onBackClick = onBackClick,
                 onPhotographerNameClick = onPhotographerNameClick,
-                onDownloadImgClick = {}
+                onDownloadImgClick = {
+                    isDownloadBottomSheetOpen = true
+                }
             )
         }
     ) {
@@ -109,12 +140,12 @@ fun FullImageContent(
         ) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
 
-                println("${fullImageState.isLoading} ${fullImageState.isError}")
+                println("${state.isLoading} ${state.isError}")
 
                 //state data API
-                if (fullImageState.isLoading) {
+                if (state.isLoading) {
                     ImageSplashLoading()
-                } else if (fullImageState.isError) {
+                } else if (state.isError) {
                     println("aa ini error ")
                     Text(text = "Error")
                 } else {
@@ -123,7 +154,7 @@ fun FullImageContent(
                         contentAlignment = Alignment.Center
                     ) {
                         val imageLoader = rememberAsyncImagePainter(
-                            model = fullImageState.image?.imageUrlRaw,
+                            model = state.image?.imageUrlRaw,
                             onState = { imageState ->
                                 println("state $imageState")
                             }
@@ -132,15 +163,16 @@ fun FullImageContent(
                         var scale by remember { mutableFloatStateOf(1f) }
                         var offset by remember { mutableStateOf(Offset.Zero) }
                         val isImageZoomed: Boolean by remember { derivedStateOf { scale != 1f } }
-                        val transformState = rememberTransformableState { zoomChange, offsetChange, _ ->
-                            scale = max(scale * zoomChange, 1f)
-                            val maxX = (constraints.maxWidth * (scale - 1)) / 2
-                            val maxY = (constraints.maxHeight * (scale - 1)) / 2
-                            offset = Offset(
-                                x = (offset.x + offsetChange.x).coerceIn(-maxX, maxX),
-                                y = (offset.y + offsetChange.y).coerceIn(-maxY, maxY)
-                            )
-                        }
+                        val transformState =
+                            rememberTransformableState { zoomChange, offsetChange, _ ->
+                                scale = max(scale * zoomChange, 1f)
+                                val maxX = (constraints.maxWidth * (scale - 1)) / 2
+                                val maxY = (constraints.maxHeight * (scale - 1)) / 2
+                                offset = Offset(
+                                    x = (offset.x + offsetChange.x).coerceIn(-maxX, maxX),
+                                    y = (offset.y + offsetChange.y).coerceIn(-maxY, maxY)
+                                )
+                            }
 
                         when (imageLoader.state) {
                             is AsyncImagePainter.State.Loading -> {

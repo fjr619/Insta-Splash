@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fjr619.instasplash.domain.model.Response
 import com.fjr619.instasplash.domain.model.UnsplashImage
+import com.fjr619.instasplash.domain.repository.ImageDownloaderRepository
 import com.fjr619.instasplash.domain.repository.ImageRepository
 import com.fjr619.instasplash.presentation.screens.navArgs
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,6 +13,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 data class FullImageState(
     var isLoading: Boolean = true,
@@ -21,6 +23,7 @@ data class FullImageState(
 
 class FullImageViewModel(
     private val repository: ImageRepository,
+    private val downloader: ImageDownloaderRepository,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -64,6 +67,16 @@ class FullImageViewModel(
             it.copy(
                 isError = value
             )
+        }
+    }
+
+    fun downloadImage(url: String, title: String?) {
+        viewModelScope.launch {
+            try {
+                downloader.downloadFile(url, title)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 }
