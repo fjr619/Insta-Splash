@@ -9,6 +9,7 @@ import io.ktor.client.call.body
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.plugins.HttpResponseValidator
 import io.ktor.client.plugins.ResponseException
+import io.ktor.client.plugins.cache.HttpCache
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.LogLevel
@@ -23,6 +24,7 @@ import kotlinx.serialization.json.Json
 
 fun createHttpClient(httpClientEngine: HttpClientEngine) = HttpClient(httpClientEngine) {
     expectSuccess = true
+    install(HttpCache)
     install(Resources)
     install(ContentNegotiation) {
         json(

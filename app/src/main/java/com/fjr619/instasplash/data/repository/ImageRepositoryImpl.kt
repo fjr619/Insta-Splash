@@ -1,9 +1,14 @@
 package com.fjr619.instasplash.data.repository
 
+import com.fjr619.instasplash.data.mapper.toDomainModel
 import com.fjr619.instasplash.data.mapper.toDomainModelList
 import com.fjr619.instasplash.data.remote.RemoteDatasource
+import com.fjr619.instasplash.data.remote.response.FailedResponseException
+import com.fjr619.instasplash.domain.model.Response
 import com.fjr619.instasplash.domain.model.UnsplashImage
 import com.fjr619.instasplash.domain.repository.ImageRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
 class ImageRepositoryImpl(
     private val remoteDatasource: RemoteDatasource
@@ -13,5 +18,16 @@ class ImageRepositoryImpl(
             page = 1,
             perPage = 10
         ).toDomainModelList()
+    }
+
+    override fun getImage(imageId: String): Flow<Response<UnsplashImage>> {
+        return flow {
+            try {
+                val response = remoteDatasource.getImagesById(imageId)
+                emit(Response.Success(response.toDomainModel()))
+            } catch (e: FailedResponseException) {
+                emit(Response.Error(e.message))
+            }
+        }
     }
 }

@@ -4,6 +4,6 @@ import io.ktor.resources.Resource
 
 @Resource("/photos")
 class ImageById {
-    @Resource("{id}")
+    @Resource("{imageId}")
     class Id(val parent: ImageById = ImageById(), val imageId: String)
 }

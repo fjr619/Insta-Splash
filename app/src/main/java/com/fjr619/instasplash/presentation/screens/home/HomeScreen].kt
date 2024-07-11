@@ -1,9 +1,7 @@
 package com.fjr619.instasplash.presentation.screens.home
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -28,7 +26,7 @@ import com.fjr619.instasplash.R
 import com.fjr619.instasplash.domain.model.UnsplashImage
 import com.fjr619.instasplash.presentation.components.ImageSplashAppBar
 import com.fjr619.instasplash.presentation.components.ImagesVerticalGrid
-import com.fjr619.instasplash.presentation.components.ZoomedImageCard
+import com.fjr619.instasplash.presentation.components.PreviewImageCard
 import com.fjr619.instasplash.presentation.screens.destinations.FavoritesScreenDestination
 import com.fjr619.instasplash.presentation.screens.destinations.FullImageScreenDestination
 import com.fjr619.instasplash.presentation.screens.destinations.SearchScreenDestination
@@ -117,7 +115,7 @@ private fun HomeContent(
                 )
             }
 
-            ZoomedImageCard(
+            PreviewImageCard(
                 modifier = Modifier.padding(20.dp),
                 isVisible = showImagePreview,
                 image = activeImage

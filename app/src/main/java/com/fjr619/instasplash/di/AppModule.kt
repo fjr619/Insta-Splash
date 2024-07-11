@@ -5,6 +5,7 @@ import com.fjr619.instasplash.data.remote.RemoteDatasourceImpl
 import com.fjr619.instasplash.data.remote.createHttpClient
 import com.fjr619.instasplash.data.repository.ImageRepositoryImpl
 import com.fjr619.instasplash.domain.repository.ImageRepository
+import com.fjr619.instasplash.presentation.screens.full_image.FullImageViewModel
 import com.fjr619.instasplash.presentation.screens.home.HomeViewModel
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.HttpClientEngine
@@ -25,4 +26,5 @@ val repositoryModule = module {
 
 val viewModelModule = module {
     viewModel { HomeViewModel(get()) }
+    viewModel { FullImageViewModel(get(), get()) }
 }

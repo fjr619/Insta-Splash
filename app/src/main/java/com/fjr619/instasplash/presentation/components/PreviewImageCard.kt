@@ -28,7 +28,7 @@ import com.fjr619.instasplash.domain.model.UnsplashImage
 import com.skydoves.cloudy.Cloudy
 
 @Composable
-fun ZoomedImageCard(
+fun PreviewImageCard(
     modifier: Modifier = Modifier,
     isVisible: Boolean,
     image: UnsplashImage?
