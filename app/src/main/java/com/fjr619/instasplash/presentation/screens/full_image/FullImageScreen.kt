@@ -70,10 +70,24 @@ fun FullImageScreen(
 
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarController: SnackbarController = LocalSnackbarController.current
+    val windowInsetsController = rememberWindowInsetsController()
+    var showBars by rememberSaveable { mutableStateOf(false) }
+
+    SnackbarMessageHandler(snackbarMessage = state.snackbarMessage, onDismissSnackbar = viewModel::dismissSnackbar)
+
+    LaunchedEffect(key1 = showBars) {
+        windowInsetsController.toggleStatusBars(show = showBars)
+    }
+
+    BackHandler(enabled = !showBars) {
+        windowInsetsController.toggleStatusBars(show = true)
+        navigator.popBackStack()
+    }
 
     FullImageContent(
         state = state,
-        onBackClick = { navigator.navigateUp() },
+        showBars = showBars,
+        onBackClick = { navigator.popBackStack() },
         onPhotographerNameClick = {
             navigator.navigate(ProfileScreenDestination(profileLink = it))
         },
@@ -84,6 +98,12 @@ fun FullImageScreen(
                     message = "Downloading ...",
                 )
             )
+        },
+        updateShowbars = { value ->
+            showBars = value
+        },
+        toggleStatusBars = {
+            windowInsetsController.toggleStatusBars(showBars)
         }
     )
 }
@@ -93,25 +113,16 @@ fun FullImageScreen(
 @Composable
 fun FullImageContent(
     state: FullImageState,
+    showBars: Boolean,
     onBackClick: () -> Unit,
     onPhotographerNameClick: (String) -> Unit,
-    onImageDownloadClick: (String, String?) -> Unit
+    onImageDownloadClick: (String, String?) -> Unit,
+    updateShowbars: (Boolean) -> Unit,
+    toggleStatusBars: () -> Unit
 ) {
-    val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    var showBars by rememberSaveable { mutableStateOf(false) }
-    val windowInsetsController = rememberWindowInsetsController()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var isDownloadBottomSheetOpen by remember { mutableStateOf(false) }
-
-    LaunchedEffect(key1 = showBars) {
-        windowInsetsController.toggleStatusBars(show = showBars)
-    }
-
-    BackHandler(enabled = !showBars) {
-        windowInsetsController.toggleStatusBars(show = true)
-        onBackClick()
-    }
 
     DownloadOptionsBottomSheet(
         isOpen = isDownloadBottomSheetOpen,
@@ -150,14 +161,10 @@ fun FullImageContent(
             modifier = Modifier.fillMaxSize()
         ) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-
-                println("${state.isLoading} ${state.isError}")
-
                 //state data API
                 if (state.isLoading) {
                     ImageSplashLoading()
                 } else if (state.isError) {
-                    println("aa ini error ")
                     Text(text = "Error")
                 } else {
                     BoxWithConstraints(
@@ -166,9 +173,6 @@ fun FullImageContent(
                     ) {
                         val imageLoader = rememberAsyncImagePainter(
                             model = state.image?.imageUrlRaw,
-                            onState = { imageState ->
-                                println("state $imageState")
-                            }
                         )
 
                         var scale by remember { mutableFloatStateOf(1f) }
@@ -210,8 +214,8 @@ fun FullImageContent(
                                         }
                                     },
                                     onClick = {
-                                        showBars = !showBars
-                                        windowInsetsController.toggleStatusBars(show = showBars)
+                                        updateShowbars(!showBars)
+                                        toggleStatusBars()
                                     },
                                     indication = null,
                                     interactionSource = remember { MutableInteractionSource() }

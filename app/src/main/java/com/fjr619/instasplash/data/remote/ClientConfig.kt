@@ -21,6 +21,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
+import java.net.UnknownHostException
 
 fun createHttpClient(httpClientEngine: HttpClientEngine) = HttpClient(httpClientEngine) {
     expectSuccess = true
@@ -53,6 +54,11 @@ fun createHttpClient(httpClientEngine: HttpClientEngine) = HttpClient(httpClient
                     val responseException = exception.response.body<FailedResponse>()
                     throw FailedResponseException(
                         message = responseException.error
+                    )
+                }
+                is UnknownHostException -> {
+                    throw FailedResponseException(
+                        message = exception.message
                     )
                 }
             }

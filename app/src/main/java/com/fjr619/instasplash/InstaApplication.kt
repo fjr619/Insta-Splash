@@ -1,6 +1,7 @@
 package com.fjr619.instasplash
 
 import android.app.Application
+import com.fjr619.instasplash.di.networkObserveModule
 import com.fjr619.instasplash.di.remoteModule
 import com.fjr619.instasplash.di.repositoryModule
 import com.fjr619.instasplash.di.viewModelModule
@@ -16,7 +17,8 @@ class InstaApplication: Application() {
             modules(
                 remoteModule,
                 repositoryModule,
-                viewModelModule
+                viewModelModule,
+                networkObserveModule
             )
         }
     }

@@ -8,17 +8,20 @@ import com.fjr619.instasplash.domain.model.UnsplashImage
 import com.fjr619.instasplash.domain.repository.ImageDownloaderRepository
 import com.fjr619.instasplash.domain.repository.ImageRepository
 import com.fjr619.instasplash.presentation.screens.navArgs
+import com.fjr619.instasplash.presentation.util.snackbar.AppSnackbarVisual
+import com.fjr619.instasplash.presentation.util.snackbar.SnackbarMessage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 data class FullImageState(
-    var isLoading: Boolean = true,
-    var isError: Boolean = false,
-    val image: UnsplashImage? = null
+    val isLoading: Boolean = true,
+    val isError: Boolean = false,
+    val image: UnsplashImage? = null,
+    val snackbarMessage: SnackbarMessage? = null
 )
 
 class FullImageViewModel(
@@ -30,29 +33,42 @@ class FullImageViewModel(
     private val navArgs: FullImageScreenNavArgs = savedStateHandle.navArgs()
 
     private val _state = MutableStateFlow(FullImageState())
-    val state = repository.getImage(navArgs.imageId).map { image ->
-        println("test $image")
-        when (image) {
-            is Response.Success -> {
-                FullImageState(
-                    isLoading = false,
-                    isError = false,
-                    image = image.data
-                )
+    val state =
+        combine(
+            _state,
+            repository.getImage(navArgs.imageId)
+        ) { state, response ->
+            when (response) {
+                is Response.Success -> {
+                    state.copy(
+                        isLoading = false,
+                        isError = false,
+                        image = response.data,
+                        snackbarMessage = null
+                    )
+                }
+
+                is Response.Error -> {
+                    state.copy(
+                        isLoading = false,
+                        isError = true,
+                        image = null,
+                        snackbarMessage = SnackbarMessage.from(
+                            snackbarVisuals = AppSnackbarVisual(
+                                message = response.message ?: "ERROR"
+                            ),
+                            onSnackbarResult = {}
+                        )
+                    )
+                }
             }
-            is Response.Error -> {
-                FullImageState(
-                    isLoading = false,
-                    isError = true,
-                    image = null,
-                )
-            }
-        }
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5000),
-        initialValue = FullImageState()
-    )
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5000),
+            initialValue = FullImageState()
+        )
+
+    fun dismissSnackbar() = _state.update { it.copy(snackbarMessage = null) }
 
     fun updateLoading(value: Boolean) {
         _state.update {

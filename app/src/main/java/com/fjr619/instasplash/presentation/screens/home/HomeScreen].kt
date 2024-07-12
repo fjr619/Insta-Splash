@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -31,6 +32,9 @@ import com.fjr619.instasplash.presentation.screens.destinations.FavoritesScreenD
 import com.fjr619.instasplash.presentation.screens.destinations.FullImageScreenDestination
 import com.fjr619.instasplash.presentation.screens.destinations.SearchScreenDestination
 import com.fjr619.instasplash.presentation.theme.InstaSplashTheme
+import com.fjr619.instasplash.presentation.util.snackbar.AppSnackbarVisual
+import com.fjr619.instasplash.presentation.util.snackbar.LocalSnackbarController
+import com.fjr619.instasplash.presentation.util.snackbar.SnackbarController
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -45,6 +49,7 @@ fun HomeScreen(
     navigator: DestinationsNavigator
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+
     HomeContent(
         scrollBehavior,
         images = viewModel.images,
@@ -81,7 +86,19 @@ private fun HomeContent(
         },
         modifier = Modifier
             .fillMaxSize()
-            .nestedScroll(scrollBehavior.nestedScrollConnection)
+            .nestedScroll(scrollBehavior.nestedScrollConnection),
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { onFABClick() }
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_save),
+                    contentDescription = "Favorites",
+                    tint = MaterialTheme.colorScheme.onBackground
+                )
+            }
+        },
+        floatingActionButtonPosition = FabPosition.End
     ) { paddingValues ->
         Box(
             modifier = Modifier
@@ -102,18 +119,7 @@ private fun HomeContent(
                     showImagePreview = false }
             )
 
-            FloatingActionButton(
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(24.dp),
-                onClick = { onFABClick() }
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_save),
-                    contentDescription = "Favorites",
-                    tint = MaterialTheme.colorScheme.onBackground
-                )
-            }
+
 
             PreviewImageCard(
                 modifier = Modifier.padding(20.dp),
