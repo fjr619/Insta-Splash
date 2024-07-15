@@ -106,7 +106,7 @@ fun FavoritesContent(
         Box(
             modifier = modifier
                 .fillMaxSize()
-                .padding(paddingValues)
+                .padding(top = paddingValues.calculateTopPadding())
                 .background(MaterialTheme.colorScheme.surface),
         ) {
             ImagesVerticalGrid(

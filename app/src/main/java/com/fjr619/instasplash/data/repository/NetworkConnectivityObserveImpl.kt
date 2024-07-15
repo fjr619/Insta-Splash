@@ -23,42 +23,32 @@ import kotlinx.coroutines.flow.stateIn
 //https://proandroiddev.com/network-connectivity-service-using-callbackflow-and-jetpack-compose-4a52c49f9abd
 class NetworkConnectivityObserveImpl(
     context: Context,
-    scope: CoroutineScope
 ) : NetworkConnectivityObserver {
     private val connectivityManager =
         context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
-    private val _networkStatus = observe().stateIn(
-        scope = scope,
-        started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5000),
-        initialValue = NetworkStatus.Disconnected
-    )
-    override val networkStatus: StateFlow<NetworkStatus> = _networkStatus
-
-    private fun observe(): Flow<NetworkStatus> {
-        return callbackFlow {
-            val connectivityCallback = object : NetworkCallback() {
-                override fun onAvailable(network: Network) {
-                    super.onAvailable(network)
-                    trySend(NetworkStatus.Connected)
-                }
-
-                override fun onLost(network: Network) {
-                    super.onLost(network)
-                    trySend(NetworkStatus.Disconnected)
-                }
+    override val networkStatus: Flow<NetworkStatus> = callbackFlow {
+        val connectivityCallback = object : NetworkCallback() {
+            override fun onAvailable(network: Network) {
+                super.onAvailable(network)
+                trySend(NetworkStatus.Connected)
             }
-            val request = NetworkRequest.Builder()
-                .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-                .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
-                .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
-                .build()
-            connectivityManager.registerNetworkCallback(request, connectivityCallback)
-            awaitClose {
-                connectivityManager.unregisterNetworkCallback(connectivityCallback)
+
+            override fun onLost(network: Network) {
+                super.onLost(network)
+                trySend(NetworkStatus.Disconnected)
             }
         }
-            .distinctUntilChanged()
-            .flowOn(Dispatchers.IO)
+        val request = NetworkRequest.Builder()
+            .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+            .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+            .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
+            .build()
+        connectivityManager.registerNetworkCallback(request, connectivityCallback)
+        awaitClose {
+            connectivityManager.unregisterNetworkCallback(connectivityCallback)
+        }
     }
+        .distinctUntilChanged()
+        .flowOn(Dispatchers.IO)
 }

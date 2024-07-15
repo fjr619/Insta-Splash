@@ -40,7 +40,7 @@ fun ImagesVerticalGrid(
         items(
             count = images.itemCount,
             key = images.itemKey(
-                key = { it.imageUrlSmall }
+                key = { "${it.id}${it.imageUrlSmall}" }
             )
         ) { index ->
             val image = images[index]

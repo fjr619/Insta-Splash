@@ -23,6 +23,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import coil.memory.MemoryCache
 import coil.request.ImageRequest
 import com.fjr619.instasplash.domain.model.UnsplashImage
 
@@ -36,6 +37,7 @@ fun ImageCard(
     val imageRequest = ImageRequest.Builder(LocalContext.current)
         .data(image?.imageUrlSmall)
         .crossfade(true)
+        .placeholderMemoryCacheKey(MemoryCache.Key(image?.imageUrlSmall ?: ""))
         .build()
     val aspectRatio: Float by remember {
         derivedStateOf { (image?.width?.toFloat() ?: 1f) / (image?.height?.toFloat() ?: 1f) }

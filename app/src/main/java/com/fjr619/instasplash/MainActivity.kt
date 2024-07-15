@@ -21,6 +21,7 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.fjr619.instasplash.domain.model.NetworkStatus
 import com.fjr619.instasplash.domain.repository.NetworkConnectivityObserver
+import com.fjr619.instasplash.presentation.MainViewModel
 import com.fjr619.instasplash.presentation.components.NetworkStatusBar
 import com.fjr619.instasplash.presentation.screens.NavGraphs
 import com.fjr619.instasplash.presentation.theme.InstaSplashTheme
@@ -30,10 +31,12 @@ import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.navigation.dependency
 import kotlinx.coroutines.delay
 import org.koin.android.ext.android.inject
+import org.koin.androidx.compose.koinViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
 
-    val connectivityObserver: NetworkConnectivityObserver by inject()
+    private val mainViewModel: MainViewModel by viewModel()
 
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,7 +49,7 @@ class MainActivity : ComponentActivity() {
                 val snackbarHostState = remember { SnackbarHostState() }
                 val coroutineScope = rememberCoroutineScope()
 
-                val status by connectivityObserver.networkStatus.collectAsStateWithLifecycle()
+                val status by mainViewModel.networkStatus.collectAsStateWithLifecycle()
                 var showMessageBar by rememberSaveable { mutableStateOf(false) }
                 var message by rememberSaveable { mutableStateOf("") }
                 var backgroundColor by remember { mutableStateOf(Color.Red) }

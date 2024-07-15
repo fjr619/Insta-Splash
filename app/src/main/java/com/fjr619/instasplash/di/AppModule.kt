@@ -14,6 +14,7 @@ import com.fjr619.instasplash.data.util.Constants
 import com.fjr619.instasplash.domain.repository.ImageDownloaderRepository
 import com.fjr619.instasplash.domain.repository.ImageRepository
 import com.fjr619.instasplash.domain.repository.NetworkConnectivityObserver
+import com.fjr619.instasplash.presentation.MainViewModel
 import com.fjr619.instasplash.presentation.screens.favorite.FavoritesViewModel
 import com.fjr619.instasplash.presentation.screens.full_image.FullImageViewModel
 import com.fjr619.instasplash.presentation.screens.home.HomeViewModel
@@ -50,6 +51,7 @@ val repositoryModule = module {
 }
 
 val viewModelModule = module {
+    viewModel { MainViewModel(get()) }
     viewModel { HomeViewModel(get()) }
     viewModel { FullImageViewModel(get(), get(), get()) }
     viewModel { SearchViewModel(get()) }
@@ -58,5 +60,5 @@ val viewModelModule = module {
 
 val networkObserveModule = module {
     single<CoroutineScope> { CoroutineScope(SupervisorJob() + Dispatchers.Default) }
-    single<NetworkConnectivityObserver> { NetworkConnectivityObserveImpl(androidContext(), get()) }
+    single<NetworkConnectivityObserver> { NetworkConnectivityObserveImpl(androidContext()) }
 }

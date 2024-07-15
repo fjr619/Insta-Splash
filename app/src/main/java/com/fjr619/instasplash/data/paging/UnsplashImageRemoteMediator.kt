@@ -13,6 +13,7 @@ import com.fjr619.instasplash.data.mapper.toEntityList
 import com.fjr619.instasplash.data.remote.RemoteDatasource
 import com.fjr619.instasplash.data.util.Constants
 import com.fjr619.instasplash.data.util.Constants.ITEMS_PER_PAGE
+import com.fjr619.instasplash.data.util.Constants.ITEMS_PER_PAGE_FROM_DB
 
 @OptIn(ExperimentalPagingApi::class)
 class UnsplashImageRemoteMediator(
@@ -53,7 +54,7 @@ class UnsplashImageRemoteMediator(
             val response =
                 remoteDatasource.getEditorialFeedImages(
                     page = currentPage,
-                    perPage = ITEMS_PER_PAGE
+                    perPage = ITEMS_PER_PAGE_FROM_DB
                 )
 
             val endOfPaginationReached = response.isEmpty()

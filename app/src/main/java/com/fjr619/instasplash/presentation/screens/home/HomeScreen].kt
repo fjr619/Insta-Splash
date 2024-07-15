@@ -116,7 +116,7 @@ private fun HomeContent(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
+                .padding(top = paddingValues.calculateTopPadding())
                 .background(MaterialTheme.colorScheme.surface),
         ) {
             ImagesVerticalGrid(

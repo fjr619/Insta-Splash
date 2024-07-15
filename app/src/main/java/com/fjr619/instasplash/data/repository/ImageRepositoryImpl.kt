@@ -31,7 +31,7 @@ class ImageRepositoryImpl(
     @OptIn(ExperimentalPagingApi::class)
     override fun getEditorialFeedImages(): Flow<PagingData<UnsplashImage>> {
         return Pager(
-            config = PagingConfig(pageSize = Constants.ITEMS_PER_PAGE),
+            config = PagingConfig(pageSize = Constants.ITEMS_PER_PAGE_FROM_DB),
             remoteMediator = UnsplashImageRemoteMediator(
                 remoteDatasource,
                 database,
@@ -70,7 +70,7 @@ class ImageRepositoryImpl(
 
     override fun getAllFavoriteImages(): Flow<PagingData<UnsplashImage>> {
         return Pager(
-            config = PagingConfig(pageSize = Constants.ITEMS_PER_PAGE),
+            config = PagingConfig(pageSize = Constants.ITEMS_PER_PAGE_FROM_DB),
             pagingSourceFactory = {
                 favoriteImagesDao.getAllFavoriteImages()
             }
