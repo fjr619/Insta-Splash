@@ -60,6 +60,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.fjr619.instasplash.domain.model.UnsplashImage
 import com.fjr619.instasplash.presentation.components.ImagesVerticalGrid
 import com.fjr619.instasplash.presentation.components.PreviewImageCard
+import com.fjr619.instasplash.presentation.util.animated_placeholder.AnimatedPlaceholder
 import com.fjr619.instasplash.presentation.util.collapsing_appbar.CollapsingAppBarNestedScrollConnection
 import com.fjr619.instasplash.presentation.util.collapsing_appbar.rememberCollapsingAppBarStateHolder
 import com.fjr619.instasplash.presentation.util.directional_lazy_scrollable_state.DirectionalLazyScrollableState
@@ -74,7 +75,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
-@RootNavGraph(true)
+@RootNavGraph()
 @Destination
 @Composable
 fun SearchScreen(
@@ -209,7 +210,16 @@ fun SearchContent(
                     keyboardController?.hide()
                     focusManager.clearFocus()
                 },
-                placeholder = { Text(text = "Search...") },
+                placeholder = {
+                    AnimatedPlaceholder(hints = listOf(
+                        "Search portrait images",
+                        "Search landscape images",
+                        "Search nature images",
+                        "Search travel images",
+                        "Search food images",
+                        "Search animal images"
+                    ))
+                },
                 leadingIcon = {
                     Icon(imageVector = Icons.Filled.Search, contentDescription = "Search")
                 },
@@ -219,7 +229,7 @@ fun SearchContent(
                             if (state.searchQuery.isNotEmpty())
                                 onAction(SearchAction.SearchQueryChanged(""))
                             else {
-//                                onBackClick()
+                                onBackClick()
                                 keyboardController?.hide()
                                 focusManager.clearFocus()
                             }

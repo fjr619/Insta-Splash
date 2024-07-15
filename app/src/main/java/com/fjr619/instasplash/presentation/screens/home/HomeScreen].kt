@@ -41,7 +41,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
-@RootNavGraph()
+@RootNavGraph(true)
 @Destination
 @Composable
 fun HomeScreen(
