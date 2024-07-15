@@ -41,7 +41,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
-@RootNavGraph(true)
+@RootNavGraph()
 @Destination
 @Composable
 fun HomeScreen(
@@ -106,18 +106,18 @@ private fun HomeContent(
                 .padding(paddingValues)
                 .background(MaterialTheme.colorScheme.surface),
         ) {
-            ImagesVerticalGrid(
-                modifier = Modifier.fillMaxSize(),
-                images = images,
-                onImageClick = onImageClick,
-                onImageDragStart = { image ->
-                    activeImage = image
-                    showImagePreview = true
-                },
-                onImageDragEnd = {
-//                    activeImage = null
-                    showImagePreview = false }
-            )
+//            ImagesVerticalGrid(
+//                modifier = Modifier.fillMaxSize(),
+//                images = images,
+//                onImageClick = onImageClick,
+//                onImageDragStart = { image ->
+//                    activeImage = image
+//                    showImagePreview = true
+//                },
+//                onImageDragEnd = {
+////                    activeImage = null
+//                    showImagePreview = false }
+//            )
 
 
 

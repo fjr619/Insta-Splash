@@ -11,6 +11,7 @@ import com.fjr619.instasplash.domain.repository.ImageRepository
 import com.fjr619.instasplash.domain.repository.NetworkConnectivityObserver
 import com.fjr619.instasplash.presentation.screens.full_image.FullImageViewModel
 import com.fjr619.instasplash.presentation.screens.home.HomeViewModel
+import com.fjr619.instasplash.presentation.screens.search.SearchViewModel
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.engine.android.Android
@@ -35,6 +36,7 @@ val repositoryModule = module {
 val viewModelModule = module {
     viewModel { HomeViewModel(get()) }
     viewModel { FullImageViewModel(get(), get(), get()) }
+    viewModel { SearchViewModel(get()) }
 }
 
 val networkObserveModule = module {
