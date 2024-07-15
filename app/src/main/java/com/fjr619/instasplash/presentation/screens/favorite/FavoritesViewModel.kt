@@ -31,11 +31,11 @@ class FavoritesViewModel(
     private val _state = MutableStateFlow(FavoriteState())
     val state = combine(
         _state,
-        repository.getAllFavoriteImages(),
+        repository.getAllFavoriteImages().cachedIn(viewModelScope),
         repository.getFavoriteImageIds()
     ) { state, images, imagesIds ->
         state.copy(
-            images = flow { emit(images) }.cachedIn(viewModelScope),
+            images = flow { emit(images) },
             favoritesImageIds = imagesIds
         )
     }.stateIn(

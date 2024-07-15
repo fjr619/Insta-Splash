@@ -3,6 +3,7 @@ package com.fjr619.instasplash.di
 import androidx.room.Room
 import com.fjr619.instasplash.data.local.FavoriteImagesDao
 import com.fjr619.instasplash.data.local.ImageSplashDatabase
+import com.fjr619.instasplash.data.local.entities.UnsplashImageDao
 import com.fjr619.instasplash.data.remote.RemoteDatasource
 import com.fjr619.instasplash.data.remote.RemoteDatasourceImpl
 import com.fjr619.instasplash.data.remote.createHttpClient
@@ -34,6 +35,7 @@ val databaseModule = module {
         Constants.IMAGE_SPLASH_DB
     ).build() }
     single<FavoriteImagesDao> { (get() as ImageSplashDatabase).favoriteImagesDao() }
+    single<UnsplashImageDao> { (get() as ImageSplashDatabase).unsplashImageDao() }
 }
 
 val remoteModule = module {
@@ -43,7 +45,7 @@ val remoteModule = module {
 }
 
 val repositoryModule = module {
-    factory<ImageRepository> { ImageRepositoryImpl(get(), get()) }
+    factory<ImageRepository> { ImageRepositoryImpl(get(), get(), get(), get()) }
     factory<ImageDownloaderRepository> { ImageDownloaderRepositoryImpl(androidContext())}
 }
 

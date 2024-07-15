@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.devtools.ksp)
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.mapsplatform.secrets)
+    alias(libs.plugins.room)
 }
 
 android {
@@ -54,6 +55,11 @@ android {
         }
     }
 }
+
+room {
+    schemaDirectory("$projectDir/schemas")
+}
+
 
 dependencies {
 

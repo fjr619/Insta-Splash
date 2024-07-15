@@ -6,4 +6,5 @@ plugins {
     alias(libs.plugins.devtools.ksp) apply false
     alias(libs.plugins.kotlinx.serialization).apply(false)
     alias(libs.plugins.mapsplatform.secrets) apply false
+    alias(libs.plugins.room) apply false
 }

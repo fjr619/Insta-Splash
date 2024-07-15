@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
@@ -23,6 +24,9 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.fjr619.instasplash.R
 import com.fjr619.instasplash.domain.model.UnsplashImage
 import com.fjr619.instasplash.presentation.components.ImageSplashAppBar
@@ -31,6 +35,7 @@ import com.fjr619.instasplash.presentation.components.PreviewImageCard
 import com.fjr619.instasplash.presentation.screens.destinations.FavoritesScreenDestination
 import com.fjr619.instasplash.presentation.screens.destinations.FullImageScreenDestination
 import com.fjr619.instasplash.presentation.screens.destinations.SearchScreenDestination
+import com.fjr619.instasplash.presentation.screens.favorite.FavoritesAction
 import com.fjr619.instasplash.presentation.theme.InstaSplashTheme
 import com.fjr619.instasplash.presentation.util.snackbar.AppSnackbarVisual
 import com.fjr619.instasplash.presentation.util.snackbar.LocalSnackbarController
@@ -49,10 +54,14 @@ fun HomeScreen(
     navigator: DestinationsNavigator
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val images = state.images.collectAsLazyPagingItems()
+    val favoriteImageIds = state.favoritesImageIds
 
     HomeContent(
         scrollBehavior,
-        images = viewModel.images,
+        images = images,
+        favoriteImageIds = favoriteImageIds,
         onImageClick = { imageId ->
             navigator.navigate(FullImageScreenDestination(imageId))
         },
@@ -61,7 +70,8 @@ fun HomeScreen(
         },
         onFABClick = {
             navigator.navigate(FavoritesScreenDestination)
-        }
+        },
+        onACtion = viewModel::onAction
     )
 }
 
@@ -69,13 +79,16 @@ fun HomeScreen(
 @Composable
 private fun HomeContent(
     scrollBehavior: TopAppBarScrollBehavior,
-    images: List<UnsplashImage>,
+    images: LazyPagingItems<UnsplashImage>,
+    favoriteImageIds: List<String>,
     onImageClick: (String) -> Unit,
     onSearchClick: () -> Unit,
     onFABClick: () -> Unit,
+    onACtion: (HomeAction) -> Unit
 ) {
     var showImagePreview by remember { mutableStateOf(false) }
     var activeImage by remember { mutableStateOf<UnsplashImage?>(null) }
+    val lazyStaggeredGridState = rememberLazyStaggeredGridState()
 
     Scaffold(
         topBar = {
@@ -106,20 +119,23 @@ private fun HomeContent(
                 .padding(paddingValues)
                 .background(MaterialTheme.colorScheme.surface),
         ) {
-//            ImagesVerticalGrid(
-//                modifier = Modifier.fillMaxSize(),
-//                images = images,
-//                onImageClick = onImageClick,
-//                onImageDragStart = { image ->
-//                    activeImage = image
-//                    showImagePreview = true
-//                },
-//                onImageDragEnd = {
-////                    activeImage = null
-//                    showImagePreview = false }
-//            )
-
-
+            ImagesVerticalGrid(
+                modifier = Modifier.fillMaxSize(),
+                lazyStaggeredGridState = lazyStaggeredGridState,
+                images = images,
+                favoriteImageIds = favoriteImageIds,
+                onImageClick = onImageClick,
+                onImageDragStart = { image ->
+                    activeImage = image
+                    showImagePreview = true
+                },
+                onImageDragEnd = {
+//                    activeImage = null
+                    showImagePreview = false },
+                onToggleFavoriteStatus = {
+                    onACtion(HomeAction.ToggleFavoriteStatus(it))
+                }
+            )
 
             PreviewImageCard(
                 modifier = Modifier.padding(20.dp),
@@ -127,21 +143,5 @@ private fun HomeContent(
                 image = activeImage
             )
         }
-    }
-
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Preview
-@Composable
-private fun HomeContentPreview() {
-    InstaSplashTheme {
-        HomeContent(
-            scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(),
-            images = listOf(),
-            onImageClick = {},
-            onSearchClick = {},
-            onFABClick = {}
-        )
     }
 }

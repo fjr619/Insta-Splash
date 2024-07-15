@@ -100,3 +100,4 @@ kotin-plugin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref
 devtools-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin"}
 mapsplatform-secrets = { id = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin", version.ref = "secretsPlugin" }
+room = { id = "androidx.room", version.ref = "room"}

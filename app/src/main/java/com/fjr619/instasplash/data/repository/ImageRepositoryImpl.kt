@@ -1,14 +1,17 @@
 package com.fjr619.instasplash.data.repository
 
+import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
 import com.fjr619.instasplash.data.local.FavoriteImagesDao
+import com.fjr619.instasplash.data.local.ImageSplashDatabase
+import com.fjr619.instasplash.data.local.entities.UnsplashImageDao
 import com.fjr619.instasplash.data.mapper.toDomainModel
-import com.fjr619.instasplash.data.mapper.toDomainModelList
 import com.fjr619.instasplash.data.mapper.toFavoriteImageEntity
 import com.fjr619.instasplash.data.paging.SearchPagingSource
+import com.fjr619.instasplash.data.paging.UnsplashImageRemoteMediator
 import com.fjr619.instasplash.data.remote.RemoteDatasource
 import com.fjr619.instasplash.data.remote.response.FailedResponseException
 import com.fjr619.instasplash.data.util.Constants
@@ -21,13 +24,28 @@ import kotlinx.coroutines.flow.map
 
 class ImageRepositoryImpl(
     private val remoteDatasource: RemoteDatasource,
+    private val database: ImageSplashDatabase,
+    private val unsplashImageDao: UnsplashImageDao,
     private val favoriteImagesDao: FavoriteImagesDao,
 ) : ImageRepository {
-    override suspend fun getEditorialFeedImages(): List<UnsplashImage> {
-        return remoteDatasource.getEditorialFeedImages(
-            page = 1,
-            perPage = 10
-        ).toDomainModelList()
+    @OptIn(ExperimentalPagingApi::class)
+    override fun getEditorialFeedImages(): Flow<PagingData<UnsplashImage>> {
+        return Pager(
+            config = PagingConfig(pageSize = Constants.ITEMS_PER_PAGE),
+            remoteMediator = UnsplashImageRemoteMediator(
+                remoteDatasource,
+                database,
+                unsplashImageDao
+            ),
+            pagingSourceFactory = {
+                unsplashImageDao.getAllEditorialFeedImages()
+            }
+        ).flow
+            .map { pagingData ->
+                pagingData.map {
+                    it.toDomainModel()
+                }
+            }
     }
 
     override fun getImage(imageId: String): Flow<Response<UnsplashImage>> {
@@ -45,7 +63,8 @@ class ImageRepositoryImpl(
         return Pager(
             config = PagingConfig(pageSize = Constants.ITEMS_PER_PAGE),
             pagingSourceFactory = {
-                SearchPagingSource(query = query, remoteDatasource = remoteDatasource) }
+                SearchPagingSource(query = query, remoteDatasource = remoteDatasource)
+            }
         ).flow
     }
 
