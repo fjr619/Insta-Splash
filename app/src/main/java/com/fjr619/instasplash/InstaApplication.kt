@@ -1,6 +1,7 @@
 package com.fjr619.instasplash
 
 import android.app.Application
+import com.fjr619.instasplash.di.databaseModule
 import com.fjr619.instasplash.di.networkObserveModule
 import com.fjr619.instasplash.di.remoteModule
 import com.fjr619.instasplash.di.repositoryModule
@@ -15,6 +16,7 @@ class InstaApplication: Application() {
         startKoin {
             androidContext(this@InstaApplication)
             modules(
+                databaseModule,
                 remoteModule,
                 repositoryModule,
                 viewModelModule,

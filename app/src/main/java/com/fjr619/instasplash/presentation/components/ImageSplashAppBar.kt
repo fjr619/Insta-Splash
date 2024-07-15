@@ -23,7 +23,8 @@ fun ImageSplashAppBar(
     modifier: Modifier = Modifier,
     scrollBehavior: TopAppBarScrollBehavior,
     title: String = "Image Splash",
-    onSearchClick: () -> Unit = {}
+    onSearchClick: () -> Unit = {},
+    navigationIcon: @Composable () -> Unit = {}
 ) {
     CenterAlignedTopAppBar(
         modifier = modifier,
@@ -51,6 +52,7 @@ fun ImageSplashAppBar(
         },
         colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
             scrolledContainerColor = MaterialTheme.colorScheme.background
-        )
+        ),
+        navigationIcon = navigationIcon
     )
 }

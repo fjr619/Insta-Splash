@@ -46,6 +46,7 @@ private object ScrollAnimation {
     }
 }
 
+//https://medium.com/proandroiddev/animated-placeholder-with-jetpack-compose-60c85547b47a
 @Composable
 fun AnimatedPlaceholder(
     hints: List<String>,

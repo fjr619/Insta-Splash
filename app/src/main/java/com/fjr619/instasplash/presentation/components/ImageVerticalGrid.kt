@@ -1,5 +1,6 @@
 package com.fjr619.instasplash.presentation.components
 
+import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.Arrangement
@@ -22,39 +23,47 @@ fun ImagesVerticalGrid(
     modifier: Modifier = Modifier,
     lazyStaggeredGridState: LazyStaggeredGridState,
     images: LazyPagingItems<UnsplashImage>,
+    favoriteImageIds: List<String>,
     onImageClick: (String) -> Unit,
     onImageDragStart: (UnsplashImage?) -> Unit,
     onImageDragEnd: () -> Unit,
+    onToggleFavoriteStatus: (UnsplashImage) -> Unit
 ) {
-    Column {
-        Spacer(modifier = modifier)
-        LazyVerticalStaggeredGrid(
-            state = lazyStaggeredGridState,
-            columns = StaggeredGridCells.Adaptive(120.dp),
-            contentPadding = PaddingValues(10.dp),
-            verticalItemSpacing = 10.dp,
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            items(
-                count = images.itemCount,
-                key = images.itemKey()
-            ) { index ->
-                val image = images[index]
-                ImageCard(
-                    image = image,
-                    modifier = Modifier
-                        .clickable { image?.id?.let { onImageClick(it) } }
-                        .pointerInput(Unit) {
-                            detectDragGesturesAfterLongPress(
-                                onDragStart = { onImageDragStart(image) },
-                                onDragCancel = { onImageDragEnd() },
-                                onDragEnd = { onImageDragEnd() },
-                                onDrag = { _, _ -> }
-                            )
-                        }
-                )
-            }
+
+    LazyVerticalStaggeredGrid(
+        state = lazyStaggeredGridState,
+        columns = StaggeredGridCells.Adaptive(120.dp),
+        contentPadding = PaddingValues(10.dp),
+        verticalItemSpacing = 10.dp,
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        items(
+            count = images.itemCount,
+            key = images.itemKey(
+                key = { it.imageUrlSmall }
+            )
+        ) { index ->
+            val image = images[index]
+            ImageCard(
+                image = image,
+                modifier = Modifier
+                    .animateItem()
+                    .clickable { image?.id?.let { onImageClick(it) } }
+                    .pointerInput(Unit) {
+                        detectDragGesturesAfterLongPress(
+                            onDragStart = { onImageDragStart(image) },
+                            onDragCancel = { onImageDragEnd() },
+                            onDragEnd = { onImageDragEnd() },
+                            onDrag = { _, _ -> }
+                        )
+                    },
+                onToggleFavoriteStatus = {
+                    image?.let {
+                        onToggleFavoriteStatus(it)
+                    }
+                },
+                isFavorite = favoriteImageIds.contains(image?.id)
+            )
         }
     }
-
 }

@@ -18,12 +18,14 @@ import kotlinx.coroutines.launch
 
 data class SearchState(
     val searchQuery: String = "",
-    val images: Flow<PagingData<UnsplashImage>> = flow { PagingData.empty<UnsplashImage>() }
+    val images: Flow<PagingData<UnsplashImage>> = flow { PagingData.empty<UnsplashImage>() },
+    val favoritesImageIds: List<String> = listOf()
 )
 
 sealed interface SearchAction {
     data class SearchQueryChanged(val query: String): SearchAction
     data object Search: SearchAction
+    data class ToggleFavoriteStatus(val image: UnsplashImage): SearchAction
 }
 
 sealed interface SearchEvent {
@@ -39,6 +41,23 @@ class SearchViewModel(
 
     private val eventChannel = Channel<SearchEvent>()
     val events = eventChannel.receiveAsFlow()
+
+    init {
+        viewModelScope.launch {
+            repository.getFavoriteImageIds()
+                .catch { e ->
+                    e.printStackTrace()
+                }
+                .collect { data ->
+                    _searchState.update {
+                        it.copy(
+                            favoritesImageIds = data
+                        )
+                    }
+                }
+        }
+
+    }
 
     fun onAction(action: SearchAction) {
         when(action) {
@@ -58,6 +77,9 @@ class SearchViewModel(
             is SearchAction.Search -> {
                 searchImages()
             }
+            is SearchAction.ToggleFavoriteStatus -> {
+                toggleFavoriteStatus(action.image)
+            }
         }
     }
 
@@ -74,6 +96,16 @@ class SearchViewModel(
                 }
                 eventChannel.send(SearchEvent.DoScrollUp)
             }catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    private fun toggleFavoriteStatus(image: UnsplashImage) {
+        viewModelScope.launch {
+            try {
+                repository.toggleFavoriteStatus(image)
+            } catch (e: Exception) {
                 e.printStackTrace()
             }
         }

@@ -6,9 +6,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
@@ -28,9 +30,7 @@ import androidx.compose.material3.SuggestionChipDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -41,27 +41,20 @@ import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
-import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.SoftwareKeyboardController
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.fjr619.instasplash.domain.model.UnsplashImage
 import com.fjr619.instasplash.presentation.components.ImagesVerticalGrid
 import com.fjr619.instasplash.presentation.components.PreviewImageCard
 import com.fjr619.instasplash.presentation.util.animated_placeholder.AnimatedPlaceholder
-import com.fjr619.instasplash.presentation.util.collapsing_appbar.CollapsingAppBarNestedScrollConnection
 import com.fjr619.instasplash.presentation.util.collapsing_appbar.rememberCollapsingAppBarStateHolder
 import com.fjr619.instasplash.presentation.util.directional_lazy_scrollable_state.DirectionalLazyScrollableState
 import com.fjr619.instasplash.presentation.util.directional_lazy_scrollable_state.ScrollDirection
@@ -86,7 +79,8 @@ fun SearchScreen(
     val state by viewModel.searchState.collectAsStateWithLifecycle()
     val lazyStaggeredGridState = rememberLazyStaggeredGridState()
     val directionalLazyStaggeredGridState = rememberDirectionalLazyScrollableState(
-        lazyStaggeredGridState.firstVisibleItemIndex, lazyStaggeredGridState.firstVisibleItemScrollOffset
+        lazyStaggeredGridState.firstVisibleItemIndex,
+        lazyStaggeredGridState.firstVisibleItemScrollOffset
     )
 
     directionalLazyStaggeredGridState.observe(
@@ -173,17 +167,23 @@ fun SearchContent(
             .fillMaxSize()
             .nestedScroll(connection)
     ) {
-        ImagesVerticalGrid(
-            modifier = Modifier.height(spaceHeight),
-            lazyStaggeredGridState = lazyStaggeredGridState,
-            images = state.images.collectAsLazyPagingItems(),
-            onImageClick = onImageClick,
-            onImageDragStart = { image ->
-                activeImage = image
-                showImagePreview = true
-            },
-            onImageDragEnd = { showImagePreview = false }
-        )
+        Column {
+            Spacer(modifier = Modifier.height(spaceHeight))
+            ImagesVerticalGrid(
+                lazyStaggeredGridState = lazyStaggeredGridState,
+                images = state.images.collectAsLazyPagingItems(),
+                favoriteImageIds = state.favoritesImageIds,
+                onImageClick = onImageClick,
+                onImageDragStart = { image ->
+                    activeImage = image
+                    showImagePreview = true
+                },
+                onImageDragEnd = { showImagePreview = false },
+                onToggleFavoriteStatus = {
+                    onAction(SearchAction.ToggleFavoriteStatus(it))
+                }
+            )
+        }
 
         Column(
             modifier = Modifier
@@ -204,21 +204,24 @@ fun SearchContent(
                 query = state.searchQuery,
                 onQueryChange = {
                     println("query $it")
-                    onAction(SearchAction.SearchQueryChanged(it)) },
+                    onAction(SearchAction.SearchQueryChanged(it))
+                },
                 onSearch = {
                     onAction(SearchAction.Search)
                     keyboardController?.hide()
                     focusManager.clearFocus()
                 },
                 placeholder = {
-                    AnimatedPlaceholder(hints = listOf(
-                        "Search portrait images",
-                        "Search landscape images",
-                        "Search nature images",
-                        "Search travel images",
-                        "Search food images",
-                        "Search animal images"
-                    ))
+                    AnimatedPlaceholder(
+                        hints = listOf(
+                            "Search portrait images",
+                            "Search landscape images",
+                            "Search nature images",
+                            "Search travel images",
+                            "Search food images",
+                            "Search animal images"
+                        )
+                    )
                 },
                 leadingIcon = {
                     Icon(imageVector = Icons.Filled.Search, contentDescription = "Search")
@@ -244,6 +247,8 @@ fun SearchContent(
                 content = {}
             )
 
+
+
             AnimatedVisibility(visible = isSuggestionChipsVisible) {
                 LazyRow(
                     contentPadding = PaddingValues(horizontal = 10.dp),
@@ -268,8 +273,6 @@ fun SearchContent(
                 }
             }
         }
-
-
 
         PreviewImageCard(
             modifier = Modifier.padding(20.dp),
