@@ -55,7 +55,7 @@ fun HomeScreen(
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val images = state.images.collectAsLazyPagingItems()
+    val images = viewModel.images.collectAsLazyPagingItems()
     val favoriteImageIds = state.favoritesImageIds
 
     HomeContent(
@@ -120,7 +120,6 @@ private fun HomeContent(
                 .background(MaterialTheme.colorScheme.surface),
         ) {
             ImagesVerticalGrid(
-                modifier = Modifier.fillMaxSize(),
                 lazyStaggeredGridState = lazyStaggeredGridState,
                 images = images,
                 favoriteImageIds = favoriteImageIds,

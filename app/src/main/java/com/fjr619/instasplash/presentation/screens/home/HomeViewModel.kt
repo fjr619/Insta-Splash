@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 data class HomeState(
-    val images: Flow<PagingData<UnsplashImage>> = flow { PagingData.empty<UnsplashImage>() },
     val favoritesImageIds: List<String> = listOf()
 )
 
@@ -28,14 +27,14 @@ class HomeViewModel(
     private val imageRepository: ImageRepository,
 ) : ViewModel() {
 
+    val images: Flow<PagingData<UnsplashImage>> = imageRepository.getEditorialFeedImages().cachedIn(viewModelScope)
+
     private val _state = MutableStateFlow(HomeState())
     val state = combine(
         _state,
-        imageRepository.getEditorialFeedImages().cachedIn(viewModelScope),
         imageRepository.getFavoriteImageIds()
-    ) { state, images, imagesIds ->
+    ) { state, imagesIds ->
         state.copy(
-            images = flow { emit(images) },
             favoritesImageIds = imagesIds
         )
     }.stateIn(

@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 data class FavoriteState(
-    val images: Flow<PagingData<UnsplashImage>> = flow { PagingData.empty<UnsplashImage>() },
     val favoritesImageIds: List<String> = listOf()
 )
 
@@ -28,14 +27,14 @@ class FavoritesViewModel(
     private val repository: ImageRepository
 ): ViewModel() {
 
+    val images: Flow<PagingData<UnsplashImage>> = repository.getAllFavoriteImages().cachedIn(viewModelScope)
+
     private val _state = MutableStateFlow(FavoriteState())
     val state = combine(
         _state,
-        repository.getAllFavoriteImages().cachedIn(viewModelScope),
         repository.getFavoriteImageIds()
-    ) { state, images, imagesIds ->
+    ) { state, imagesIds ->
         state.copy(
-            images = flow { emit(images) },
             favoritesImageIds = imagesIds
         )
     }.stateIn(

@@ -44,7 +44,7 @@ fun FavoritesScreen(
 ) {
 
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val favoriteImages = state.images.collectAsLazyPagingItems()
+    val favoriteImages = viewModel.images.collectAsLazyPagingItems()
     val favoriteImageIds = state.favoritesImageIds
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
@@ -111,7 +111,6 @@ fun FavoritesContent(
         ) {
             ImagesVerticalGrid(
                 lazyStaggeredGridState = lazyStaggeredGridState,
-                modifier = Modifier.fillMaxSize(),
                 images = favoriteImages,
                 favoriteImageIds = favoriteImageIds,
                 onImageClick = onImageClick,
