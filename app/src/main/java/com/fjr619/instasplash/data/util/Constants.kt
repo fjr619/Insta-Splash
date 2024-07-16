@@ -10,6 +10,6 @@ object Constants {
     const val REMOTE_KEYS_TABLE = "remote_keys_table"
 
     const val STARTING_PAGE_INDEX = 1
-    const val ITEMS_PER_PAGE = 20
-    const val ITEMS_PER_PAGE_FROM_DB = 30
+    const val ITEMS_PER_PAGE = 10
+    const val ITEMS_PER_PAGE_FROM_DB = 20
 }

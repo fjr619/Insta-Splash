@@ -19,6 +19,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.fjr619.instasplash.presentation.screens.favorite.FavoritesScreen
@@ -28,8 +29,8 @@ import com.fjr619.instasplash.presentation.screens.full_image.FullImageViewModel
 import com.fjr619.instasplash.presentation.screens.home.HomeScreen
 import com.fjr619.instasplash.presentation.screens.home.HomeViewModel
 import com.fjr619.instasplash.presentation.screens.profile.ProfileScreen
-import com.fjr619.instasplash.presentation.screens.search.SearchScreen
 import com.fjr619.instasplash.presentation.screens.search.SearchEvent
+import com.fjr619.instasplash.presentation.screens.search.SearchScreen
 import com.fjr619.instasplash.presentation.screens.search.SearchViewModel
 import com.fjr619.instasplash.presentation.util.directional_lazy_scrollable_state.ScrollDirection
 import com.fjr619.instasplash.presentation.util.directional_lazy_scrollable_state.rememberDirectionalLazyScrollableState
@@ -42,7 +43,6 @@ import com.fjr619.instasplash.presentation.util.toggleStatusBars
 import com.fjr619.studyfocus.presentation.util.ObserveAsEvents
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import okhttp3.Route
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -140,7 +140,15 @@ fun NavGraphSetup(
             )
         }
 
-        composable<Routes.FullImageScreen> {
+        composable<Routes.FullImageScreen>(
+            deepLinks = listOf(
+                navDeepLink {
+                    //example deeplink -> adb shell am start -W -a android.intent.action.VIEW -d "example://compose/image/fag7vJEpUFM"
+                    uriPattern = "example://compose/image/{imageId}"
+                }
+            )
+        ) { entry ->
+            println("data ${entry.toRoute<Routes.FullImageScreen>().imageId}")
             val viewModel: FullImageViewModel = koinViewModel()
             val state by viewModel.state.collectAsStateWithLifecycle()
             val snackbarController: SnackbarController = LocalSnackbarController.current
@@ -194,7 +202,6 @@ fun NavGraphSetup(
                 }
             )
         }
-
 
         composable<Routes.FavoritesScreen> {
             val viewModel: FavoritesViewModel = koinViewModel()

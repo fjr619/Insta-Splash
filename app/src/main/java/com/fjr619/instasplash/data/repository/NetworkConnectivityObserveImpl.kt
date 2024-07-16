@@ -31,11 +31,13 @@ class NetworkConnectivityObserveImpl(
         val connectivityCallback = object : NetworkCallback() {
             override fun onAvailable(network: Network) {
                 super.onAvailable(network)
+                println("avaiable")
                 trySend(NetworkStatus.Connected)
             }
 
             override fun onLost(network: Network) {
                 super.onLost(network)
+                println("lost")
                 trySend(NetworkStatus.Disconnected)
             }
         }
@@ -44,7 +46,7 @@ class NetworkConnectivityObserveImpl(
             .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
             .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
             .build()
-        connectivityManager.registerNetworkCallback(request, connectivityCallback)
+        connectivityManager.registerDefaultNetworkCallback(connectivityCallback)
         awaitClose {
             connectivityManager.unregisterNetworkCallback(connectivityCallback)
         }
