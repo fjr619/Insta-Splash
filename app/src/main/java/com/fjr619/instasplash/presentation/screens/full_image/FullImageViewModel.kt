@@ -3,11 +3,12 @@ package com.fjr619.instasplash.presentation.screens.full_image
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import com.fjr619.instasplash.domain.model.Response
 import com.fjr619.instasplash.domain.model.UnsplashImage
 import com.fjr619.instasplash.domain.repository.ImageDownloaderRepository
 import com.fjr619.instasplash.domain.repository.ImageRepository
-import com.fjr619.instasplash.presentation.screens.navArgs
+import com.fjr619.instasplash.presentation.navigation.Routes
 import com.fjr619.instasplash.presentation.util.snackbar.AppSnackbarVisual
 import com.fjr619.instasplash.presentation.util.snackbar.SnackbarMessage
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,13 +31,13 @@ class FullImageViewModel(
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val navArgs: FullImageScreenNavArgs = savedStateHandle.navArgs()
+    private val imageId = savedStateHandle.toRoute<Routes.FullImageScreen>().imageId
 
     private val _state = MutableStateFlow(FullImageState())
     val state =
         combine(
             _state,
-            repository.getImage(navArgs.imageId)
+            repository.getImage(imageId)
         ) { state, response ->
             when (response) {
                 is Response.Success -> {

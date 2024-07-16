@@ -15,23 +15,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.compose.rememberNavController
 import com.fjr619.instasplash.domain.model.NetworkStatus
-import com.fjr619.instasplash.domain.repository.NetworkConnectivityObserver
 import com.fjr619.instasplash.presentation.MainViewModel
 import com.fjr619.instasplash.presentation.components.NetworkStatusBar
-import com.fjr619.instasplash.presentation.screens.NavGraphs
+import com.fjr619.instasplash.presentation.navigation.NavGraphSetup
 import com.fjr619.instasplash.presentation.theme.InstaSplashTheme
 import com.fjr619.instasplash.presentation.util.snackbar.AppSnackbar
 import com.fjr619.instasplash.presentation.util.snackbar.ProvideSnackbarController
-import com.ramcosta.composedestinations.DestinationsNavHost
-import com.ramcosta.composedestinations.navigation.dependency
 import kotlinx.coroutines.delay
-import org.koin.android.ext.android.inject
-import org.koin.androidx.compose.koinViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
@@ -53,6 +48,8 @@ class MainActivity : ComponentActivity() {
                 var showMessageBar by rememberSaveable { mutableStateOf(false) }
                 var message by rememberSaveable { mutableStateOf("") }
                 var backgroundColor by remember { mutableStateOf(Color.Red) }
+
+                val navController = rememberNavController()
 
                 //TODO improvement will data class
                 LaunchedEffect(key1 = status) {
@@ -91,13 +88,16 @@ class MainActivity : ComponentActivity() {
 
                         },
                     ) {
-                        DestinationsNavHost(
-                            modifier = Modifier,
-                            navGraph = NavGraphs.root,
-                            dependenciesContainerBuilder = {
-                                dependency(snackbarHostState)
-                            }
+                        NavGraphSetup(
+                            navController = navController
                         )
+//                        DestinationsNavHost(
+//                            modifier = Modifier,
+//                            navGraph = NavGraphs.root,
+//                            dependenciesContainerBuilder = {
+//                                dependency(snackbarHostState)
+//                            }
+//                        )
                     }
                 }
             }

@@ -1,8 +1,6 @@
 package com.fjr619.instasplash.presentation.screens.full_image
 
 import android.annotation.SuppressLint
-import android.widget.Toast
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.combinedClickable
@@ -19,99 +17,36 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.fjr619.instasplash.presentation.components.ImageSplashLoading
-import com.fjr619.instasplash.presentation.screens.destinations.ProfileScreenDestination
 import com.fjr619.instasplash.presentation.screens.full_image.components.DownloadOptionsBottomSheet
 import com.fjr619.instasplash.presentation.screens.full_image.components.FullImageTopAppBar
 import com.fjr619.instasplash.presentation.screens.full_image.components.ImageDownloadOption
-import com.fjr619.instasplash.presentation.util.rememberWindowInsetsController
-import com.fjr619.instasplash.presentation.util.snackbar.AppSnackbarVisual
-import com.fjr619.instasplash.presentation.util.snackbar.LocalSnackbarController
-import com.fjr619.instasplash.presentation.util.snackbar.SnackbarController
-import com.fjr619.instasplash.presentation.util.snackbar.SnackbarMessageHandler
-import com.fjr619.instasplash.presentation.util.toggleStatusBars
-import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.annotation.RootNavGraph
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.launch
-import org.koin.androidx.compose.koinViewModel
 import kotlin.math.max
 
 data class FullImageScreenNavArgs(
     val imageId: String,
 )
 
-@RootNavGraph
-@Destination(
-    navArgsDelegate = FullImageScreenNavArgs::class
-)
-@Composable
-fun FullImageScreen(
-    navigator: DestinationsNavigator,
-    viewModel: FullImageViewModel = koinViewModel()
-) {
-
-    val state by viewModel.state.collectAsStateWithLifecycle()
-    val snackbarController: SnackbarController = LocalSnackbarController.current
-    val windowInsetsController = rememberWindowInsetsController()
-    var showBars by rememberSaveable { mutableStateOf(false) }
-
-    SnackbarMessageHandler(snackbarMessage = state.snackbarMessage, onDismissSnackbar = viewModel::dismissSnackbar)
-
-    LaunchedEffect(key1 = showBars) {
-        windowInsetsController.toggleStatusBars(show = showBars)
-    }
-
-    BackHandler(enabled = !showBars) {
-        windowInsetsController.toggleStatusBars(show = true)
-        navigator.popBackStack()
-    }
-
-    FullImageContent(
-        state = state,
-        showBars = showBars,
-        onBackClick = { navigator.popBackStack() },
-        onPhotographerNameClick = {
-            navigator.navigate(ProfileScreenDestination(profileLink = it))
-        },
-        onImageDownloadClick = { url, title ->
-            viewModel.downloadImage(url, title)
-            snackbarController.showMessage(
-                snackbarVisuals = AppSnackbarVisual(
-                    message = "Downloading ...",
-                )
-            )
-        },
-        updateShowbars = { value ->
-            showBars = value
-        },
-        toggleStatusBars = {
-            windowInsetsController.toggleStatusBars(showBars)
-        }
-    )
-}
-
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun FullImageContent(
+fun FullImageScreen(
     state: FullImageState,
     showBars: Boolean,
     onBackClick: () -> Unit,
@@ -120,6 +55,7 @@ fun FullImageContent(
     updateShowbars: (Boolean) -> Unit,
     toggleStatusBars: () -> Unit
 ) {
+    val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var isDownloadBottomSheetOpen by remember { mutableStateOf(false) }
@@ -172,7 +108,10 @@ fun FullImageContent(
                         contentAlignment = Alignment.Center
                     ) {
                         val imageLoader = rememberAsyncImagePainter(
-                            model = state.image?.imageUrlRaw,
+                            model = ImageRequest.Builder(context)
+                                .data(state.image?.imageUrlRaw)
+                                .crossfade(true)
+                                .build(),
                         )
 
                         var scale by remember { mutableFloatStateOf(1f) }

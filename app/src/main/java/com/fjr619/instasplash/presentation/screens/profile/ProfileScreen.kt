@@ -1,12 +1,8 @@
 package com.fjr619.instasplash.presentation.screens.profile
 
-import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.annotation.RootNavGraph
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -28,24 +24,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 
-@RootNavGraph
-@Destination
-@Composable
-fun ProfileScreen(
-    profileLink: String,
-    navigator: DestinationsNavigator
-) {
-    ProfileContent(
-        profileLink,
-        onBackClick = {
-            navigator.popBackStack()
-        }
-    )
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ProfileContent(
+fun ProfileScreen(
     profileLink: String,
     onBackClick: () -> Unit
 ) {
