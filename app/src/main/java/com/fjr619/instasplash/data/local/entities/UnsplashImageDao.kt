@@ -26,4 +26,7 @@ interface UnsplashImageDao {
 
     @Query("DELETE FROM remote_keys_table")
     suspend fun deleteAllRemoteKeys()
+
+    @Query("SELECT created_at FROM remote_keys_table Order By created_at DESC LIMIT 1")
+    suspend fun getCreationTime(): Long?
 }

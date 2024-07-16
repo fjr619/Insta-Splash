@@ -12,8 +12,13 @@ import com.fjr619.instasplash.data.local.entities.UnsplashRemoteKeys
 
 @Database(
     entities = [FavoriteImageEntity::class, UnsplashImageEntity::class, UnsplashRemoteKeys::class],
-    version = 1,
+    version = 2,
     exportSchema = true,
+    autoMigrations = [
+        AutoMigration(
+            from = 1, to = 2
+        )
+    ]
 )
 abstract class ImageSplashDatabase: RoomDatabase() {
     abstract fun favoriteImagesDao(): FavoriteImagesDao
