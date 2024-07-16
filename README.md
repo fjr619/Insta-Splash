@@ -1,4 +1,4 @@
-# Study Focus with Jetpack compose
+# Insta Splash with Unsplash API
 
 ## Tech stack
 - Kotlin
@@ -13,3 +13,18 @@
 - Coroutine - Flow
 - Splashscreen
 - [Cloudy](https://github.com/skydoves/Cloudy)
+
+<table>
+  <tr>
+    <th>Home</th>
+    <th>Favorite</th>
+    <th>Search</th>
+        <th>Image</th>
+  </tr>
+  <tr>
+    <td><img src="media/home.png" height="25%"/></td>
+    <td><img src="media/favorites.png" height="25%"/></td>
+    <td><img src="media/search.png" height="25%"/></td>
+    <td><img src="media/image.png" height="25%"/></td>
+  </tr>
+</table>
