@@ -49,7 +49,6 @@ import com.fjr619.instasplash.presentation.components.ImagesVerticalGrid
 import com.fjr619.instasplash.presentation.components.PreviewImageCard
 import com.fjr619.instasplash.presentation.util.animated_placeholder.AnimatedPlaceholder
 import com.fjr619.instasplash.presentation.util.collapsing_appbar.rememberCollapsingAppBarStateHolder
-import com.fjr619.instasplash.presentation.util.directional_lazy_scrollable_state.DirectionalLazyScrollableState
 import com.fjr619.instasplash.presentation.util.searchKeywords
 
 
@@ -75,27 +74,32 @@ fun SearchScreen(
     val connection = collapsingAppBarStateHolder.getConnection()
     val spaceHeight by collapsingAppBarStateHolder.getSpaceHeight(connection.appBarOffset)
 
+    val searchImages = state.images.collectAsLazyPagingItems()
+
     Box(
         modifier = Modifier
             .fillMaxSize()
             .nestedScroll(connection)
     ) {
-        Column {
-            Spacer(modifier = Modifier.height(spaceHeight))
-            ImagesVerticalGrid(
-                lazyStaggeredGridState = lazyStaggeredGridState,
-                images = state.images.collectAsLazyPagingItems(),
-                favoriteImageIds = state.favoritesImageIds,
-                onImageClick = onImageClick,
-                onImageDragStart = { image ->
-                    activeImage = image
-                    showImagePreview = true
-                },
-                onImageDragEnd = { showImagePreview = false },
-                onToggleFavoriteStatus = {
-                    onAction(SearchAction.ToggleFavoriteStatus(it))
-                }
-            )
+        if (state.searchQuery.isNotEmpty()) {
+            Column {
+                Spacer(modifier = Modifier.height(spaceHeight))
+                ImagesVerticalGrid(
+                    lazyStaggeredGridState = lazyStaggeredGridState,
+                    images = searchImages,
+                    favoriteImageIds = state.favoritesImageIds,
+                    loadState = searchImages.loadState,
+                    onImageClick = onImageClick,
+                    onImageDragStart = { image ->
+                        activeImage = image
+                        showImagePreview = true
+                    },
+                    onImageDragEnd = { showImagePreview = false },
+                    onToggleFavoriteStatus = {
+                        onAction(SearchAction.ToggleFavoriteStatus(it))
+                    }
+                )
+            }
         }
 
         Column(

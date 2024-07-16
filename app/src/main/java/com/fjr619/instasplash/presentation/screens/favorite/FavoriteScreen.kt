@@ -69,6 +69,7 @@ fun FavoritesScreen(
             ImagesVerticalGrid(
                 lazyStaggeredGridState = lazyStaggeredGridState,
                 images = favoriteImages,
+                loadState = favoriteImages.loadState,
                 favoriteImageIds = favoriteImageIds,
                 onImageClick = onImageClick,
                 onImageDragStart = { image ->

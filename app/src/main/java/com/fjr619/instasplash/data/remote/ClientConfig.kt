@@ -51,10 +51,23 @@ fun createHttpClient(httpClientEngine: HttpClientEngine) = HttpClient(httpClient
         handleResponseExceptionWithRequest { exception, _ ->
             when(exception) {
                 is ResponseException -> {
-                    val responseException = exception.response.body<FailedResponse>()
-                    throw FailedResponseException(
-                        message = responseException.error
-                    )
+                    throw when(exception.response.status.value) {
+                        403 -> FailedResponseException(message = "Rate Limit Exceed")
+                        else -> {
+                            try {
+                                val responseException = exception.response.body<FailedResponse>()
+                                FailedResponseException(
+                                    message = responseException.error
+                                )
+                            } catch (e: Exception) {
+                                FailedResponseException(
+                                    message = "Network Error"
+                                )
+                            }
+
+                        }
+                    }
+
                 }
                 is UnknownHostException -> {
                     throw FailedResponseException(

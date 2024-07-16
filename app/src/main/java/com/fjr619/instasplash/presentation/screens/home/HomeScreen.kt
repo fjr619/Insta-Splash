@@ -76,6 +76,7 @@ fun HomeScreen(
                 lazyStaggeredGridState = lazyStaggeredGridState,
                 images = images,
                 favoriteImageIds = favoriteImageIds,
+                loadState = images.loadState,
                 onImageClick = onImageClick,
                 onImageDragStart = { image ->
                     activeImage = image
