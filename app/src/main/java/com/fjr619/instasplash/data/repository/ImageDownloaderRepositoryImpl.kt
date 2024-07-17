@@ -5,8 +5,10 @@ import android.content.Context
 import android.os.Environment
 import androidx.core.net.toUri
 import com.fjr619.instasplash.domain.repository.ImageDownloaderRepository
+import org.koin.core.annotation.Single
 import java.io.File
 
+@Single
 class ImageDownloaderRepositoryImpl(
     context: Context
 ): ImageDownloaderRepository {

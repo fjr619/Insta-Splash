@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.koin.android.annotation.KoinViewModel
 
 data class SearchState(
     val searchQuery: String = "",
@@ -32,6 +33,7 @@ sealed interface SearchEvent {
     data object DoScrollUp: SearchEvent
 }
 
+@KoinViewModel
 class SearchViewModel(
     private val repository: ImageRepository
 ): ViewModel() {

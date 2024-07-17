@@ -44,6 +44,22 @@ android {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_17)
         }
+
+        // to use KSP generated Code
+        // KSP - To use generated sources
+
+//        sourceSets {
+//            getByName("main").kotlin.srcDirs("src/main/kotlin")
+//            getByName("test").kotlin.srcDirs("src/test/kotlin")
+//        }
+
+        applicationVariants.configureEach {
+            kotlin.sourceSets {
+                getByName(name) {
+                    kotlin.srcDir("build/generated/ksp/${name}/kotlin")
+                }
+            }
+        }
     }
     buildFeatures {
         compose = true
@@ -54,12 +70,19 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+
+
+
+
+    room {
+        schemaDirectory("$projectDir/schemas")
+    }
 }
 
-room {
-    schemaDirectory("$projectDir/schemas")
+ksp {
+    arg("KOIN_CONFIG_CHECK","true")
+    arg("KOIN_DEFAULT_MODULE","true")
 }
-
 
 dependencies {
 
@@ -82,6 +105,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     implementation(libs.bundles.koin)
+    ksp(libs.koin.ksp.compiler)
 
     implementation(libs.bundles.room)
     ksp(libs.room.compiler)

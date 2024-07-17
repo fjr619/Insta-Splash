@@ -21,7 +21,9 @@ import com.fjr619.instasplash.domain.repository.ImageRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import org.koin.core.annotation.Single
 
+@Single
 class ImageRepositoryImpl(
     private val remoteDatasource: RemoteDatasource,
     private val database: ImageSplashDatabase,

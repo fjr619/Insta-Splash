@@ -8,7 +8,9 @@ import com.fjr619.instasplash.data.remote.response.UnsplashImagesSearchResponse
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.resources.get
+import org.koin.core.annotation.Single
 
+@Single
 class RemoteDatasourceImpl(
     private val client: HttpClient
 ): RemoteDatasource {

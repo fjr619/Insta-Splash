@@ -18,8 +18,10 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.stateIn
+import org.koin.core.annotation.Single
 
 
+@Single
 //https://proandroiddev.com/network-connectivity-service-using-callbackflow-and-jetpack-compose-4a52c49f9abd
 class NetworkConnectivityObserveImpl(
     context: Context,

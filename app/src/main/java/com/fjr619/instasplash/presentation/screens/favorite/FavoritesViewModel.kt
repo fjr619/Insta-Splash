@@ -4,16 +4,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.fjr619.instasplash.di.viewModelModule
 import com.fjr619.instasplash.domain.model.UnsplashImage
 import com.fjr619.instasplash.domain.repository.ImageRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import org.koin.android.annotation.KoinViewModel
 
 data class FavoriteState(
     val favoritesImageIds: List<String> = listOf()
@@ -23,6 +22,7 @@ sealed interface FavoritesAction {
     data class ToggleFavoriteStatus(val image: UnsplashImage): FavoritesAction
 }
 
+@KoinViewModel
 class FavoritesViewModel(
     private val repository: ImageRepository
 ): ViewModel() {

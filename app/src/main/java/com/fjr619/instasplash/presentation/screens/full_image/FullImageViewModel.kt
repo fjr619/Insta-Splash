@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.koin.android.annotation.KoinViewModel
 
 data class FullImageState(
     val isLoading: Boolean = true,
@@ -25,6 +26,7 @@ data class FullImageState(
     val snackbarMessage: SnackbarMessage? = null
 )
 
+@KoinViewModel
 class FullImageViewModel(
     private val repository: ImageRepository,
     private val downloader: ImageDownloaderRepository,

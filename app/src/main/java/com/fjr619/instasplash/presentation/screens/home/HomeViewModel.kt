@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import org.koin.android.annotation.KoinViewModel
 
 data class HomeState(
     val favoritesImageIds: List<String> = listOf()
@@ -23,6 +24,7 @@ sealed interface HomeAction {
     data class ToggleFavoriteStatus(val image: UnsplashImage) : HomeAction
 }
 
+@KoinViewModel
 class HomeViewModel(
     private val imageRepository: ImageRepository,
 ) : ViewModel() {
